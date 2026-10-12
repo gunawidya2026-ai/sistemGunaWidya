@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Perpustakaan Guna Widya – SMA Negeri 1 Sukasada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F2F5F1; --surface:#FFFFFF; --soft:#EAF0EA; --line:#D3DCD2; --ink:#16313A; --muted:#566964;
+  --green:#2D6A4E; --on-green:#FFFFFF; --gold:#8A6400; --goldbg:#FBF0CF; --red:#A3352E; --redbg:#F8E0DD; --okbg:#DDEFE4; --ok:#1F5C3F;
+  --rule:#DCE6EE; --margin:#E7A8A2;
+  --serif:'Bitter',Georgia,'Times New Roman',serif; --sans:'Public Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1A1D; --surface:#152327; --soft:#1B2D32; --line:#2B3E43; --ink:#E5EEEA; --muted:#9DB1AB;
+    --green:#74C49A; --on-green:#0B2018; --gold:#E3BC52; --goldbg:#33290B; --red:#F0928A; --redbg:#3A1C1A; --okbg:#173325; --ok:#8FD6AE;
+    --rule:#20343B; --margin:#7A3A35;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1A1D; --surface:#152327; --soft:#1B2D32; --line:#2B3E43; --ink:#E5EEEA; --muted:#9DB1AB;
+  --green:#74C49A; --on-green:#0B2018; --gold:#E3BC52; --goldbg:#33290B; --red:#F0928A; --redbg:#3A1C1A; --okbg:#173325; --ok:#8FD6AE;
+  --rule:#20343B; --margin:#7A3A35;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--serif);margin:0;line-height:1.2}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* Gerbang masuk */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.gate-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:28px 24px}
+.gate-card h1{font-size:1.6rem}
+.gate-card .sub{color:var(--muted);margin:4px 0 20px}
+.recovery{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.4rem;letter-spacing:.08em;background:var(--soft);border:1px dashed var(--line);border-radius:8px;padding:14px;text-align:center;margin:12px 0;user-select:all}
+
+/* Form */
+label{display:block;font-weight:500;font-size:.92rem;margin:0 0 14px}
+label>input,label>select,label>textarea,.fld{display:block;width:100%;margin-top:5px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:7px;min-height:44px}
+label>input:disabled,input:disabled{background:var(--soft);color:var(--muted)}
+textarea{resize:vertical}
+.chk{display:flex;gap:10px;align-items:center;font-weight:400;margin:-6px 0 14px}
+.chk input{width:20px;height:20px;margin:0;flex:none;accent-color:var(--green)}
+.hint{font-size:.85rem;color:var(--muted);margin:-8px 0 14px}
+.hint.info{color:var(--ok)}
+.err{background:var(--redbg);color:var(--red);padding:10px 12px;border-radius:7px;font-size:.92rem;margin:0 0 12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+
+/* Tombol */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 16px;border-radius:7px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;text-decoration:none}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:36px;padding:4px 12px;font-size:.88rem}
+.btn.block{width:100%}
+.linkbtn{background:none;border:0;padding:6px 0;color:var(--green);text-decoration:underline;cursor:pointer;font-weight:500}
+
+/* Header & navigasi */
+header.top{background:var(--ink);color:#F2F5F1;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+:root[data-theme="dark"] header.top{background:#0A1315}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;padding-bottom:6px}
+.brand h1{font-size:1.25rem;color:#fff}
+.brand p{margin:0;font-size:.85rem;opacity:.8}
+.who{display:flex;align-items:center;gap:10px;font-size:.85rem}
+.who .btn{background:transparent;color:#fff;border-color:rgba(255,255,255,.35);min-height:36px;padding:4px 12px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;padding-top:6px}
+nav.tabs button{background:none;border:0;border-bottom:3px solid transparent;color:#C9D6D1;padding:10px 14px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:44px}
+nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:#E7C45B}
+main{padding:20px 0 60px}
+.view>*+*{margin-top:16px}
+
+/* Kartu katalog: ringkasan */
+.card-index{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--margin);border-radius:8px;
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--rule) 31px,var(--rule) 32px);
+  display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:14px 16px 10px}
+.stat b{display:block;font-family:var(--serif);font-size:2rem;line-height:1.1}
+.stat span{font-size:.85rem;color:var(--muted)}
+@media(max-width:640px){.card-index{grid-template-columns:repeat(2,1fr)}}
+.mini{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:.92rem;color:var(--muted)}
+.mini b{color:var(--ink)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toolbar .grow{flex:1 1 220px}
+.toolbar input[type=search],.toolbar select{width:100%;padding:10px 12px;min-height:44px;background:var(--surface);border:1px solid var(--line);border-radius:7px}
+.toolbar select{width:auto}
+
+/* Daftar judul */
+.grp{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.grp-head{display:flex;width:100%;align-items:center;gap:12px;text-align:left;background:none;border:0;padding:12px 16px;cursor:pointer;min-height:56px}
+.grp-head:hover{background:var(--soft)}
+.grp-title{flex:1;min-width:0}
+.grp-title h3{font-size:1.05rem;overflow-wrap:anywhere}
+.grp-title p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+.chev{transition:transform .15s;flex:none;color:var(--muted)}
+.grp.open .chev{transform:rotate(90deg)}
+.grp-body{border-top:1px solid var(--line);padding:12px 16px;background:var(--bg)}
+.grp-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.8rem;font-weight:600;white-space:nowrap}
+.badge.ok{background:var(--okbg);color:var(--ok)}
+.badge.warn{background:var(--goldbg);color:var(--gold)}
+.badge.bad{background:var(--redbg);color:var(--red)}
+.badge.neu{background:var(--soft);color:var(--muted)}
+.counts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th{text-align:left;font-weight:600;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);font-size:.85rem}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl-wrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.num{text-align:right;white-space:nowrap}
+.muted{color:var(--muted)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:8px}
+
+@media(max-width:760px){
+  table.resp thead{display:none}
+  table.resp,table.resp tbody,table.resp tr,table.resp td{display:block;width:100%}
+  table.resp tr{padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.resp td{border:0;padding:3px 0;display:flex;justify-content:space-between;gap:12px;text-align:right}
+  table.resp td::before{content:attr(data-l);color:var(--muted);font-size:.85rem;text-align:left;flex:none}
+  table.resp td.full{display:block;text-align:left}
+  table.resp td.full::before{display:none}
+  .num{text-align:right}
+}
+
+/* Kartu isi (unduh/pengaturan) */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.panel h2{font-size:1.15rem;margin-bottom:6px}
+.panel p{margin:0 0 12px;color:var(--muted);font-size:.92rem}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--soft);border-radius:99px;padding:2px 4px 2px 12px;font-size:.88rem}
+.chip button{border:0;background:none;cursor:pointer;width:28px;height:28px;border-radius:50%;color:var(--muted)}
+
+/* Dialog */
+dialog{border:0;padding:0;border-radius:10px;background:var(--surface);color:var(--ink);width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,20,22,.55)}
+.dlg-in{display:flex;flex-direction:column;max-height:calc(100vh - 24px)}
+.dlg-in header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dlg-in h2{font-size:1.15rem}
+.dlg-in .x{border:0;background:none;font-size:1.6rem;line-height:1;cursor:pointer;width:40px;height:40px;color:var(--muted)}
+.dlg-body{padding:18px 20px 4px;overflow-y:auto}
+.dlg-in footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--line)}
+.pk-list{display:grid;gap:4px;margin:-8px 0 14px}
+.pk-list button{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer;min-height:44px}
+.pk-list button:hover{background:var(--soft)}
+.pk-list small{display:block;color:var(--muted)}
+.pk-sel{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--okbg);border:1px solid var(--line);border-radius:7px;padding:8px 12px;margin:5px 0 14px}
+.pk-sel small{display:block;color:var(--muted)}
+.calc{background:var(--soft);border-radius:7px;padding:10px 12px;font-size:.92rem;margin:0 0 14px}
+.calc b{font-family:var(--serif)}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;z-index:50;max-width:calc(100vw - 32px);font-size:.92rem}
+.banner{background:var(--goldbg);color:var(--gold);border-radius:8px;padding:10px 14px;font-size:.92rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="gate" hidden></div>
+
+<div id="main" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="top-in">
+        <div class="brand">
+          <h1>Perpustakaan Guna Widya</h1>
+          <p>SMA Negeri 1 Sukasada</p>
+        </div>
+        <div class="who"><span id="whoName"></span><button class="btn" id="btnLogout" type="button">Keluar</button></div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Menu utama">
+        <button role="tab" data-tab="katalog" aria-selected="true">Katalog</button>
+        <button role="tab" data-tab="pinjam" aria-selected="false">Peminjaman</button>
+        <button role="tab" data-tab="unduh" aria-selected="false">Unduh data</button>
+        <button role="tab" data-tab="atur" aria-selected="false">Pengaturan</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="storeWarn" class="banner" hidden>Penyimpanan peramban tidak tersedia, jadi data akan hilang saat halaman ditutup. Unduh cadangan secara berkala di menu Unduh data.</div>
+
+    <section class="view" id="v-katalog">
+      <div class="card-index" id="stats"></div>
+      <div class="toolbar">
+        <button class="btn primary" data-act="addbook" type="button">+ Tambah buku</button>
+        <div class="grow"><input type="search" id="catQ" placeholder="Cari judul, no. inventaris, atau kode buku" aria-label="Cari buku"></div>
+      </div>
+      <div id="catList"></div>
+    </section>
+
+    <section class="view" id="v-pinjam" hidden>
+      <div class="mini" id="loanStats"></div>
+      <div class="toolbar">
+        <button class="btn primary" data-act="addloan" type="button">+ Catat peminjaman</button>
+        <div class="grow"><input type="search" id="loanQ" placeholder="Cari peminjam, judul, no. inventaris, atau kode" aria-label="Cari peminjaman"></div>
+        <select id="loanF" aria-label="Filter status">
+          <option value="all">Semua</option>
+          <option value="aktif">Sedang dipinjam</option>
+          <option value="telat">Terlambat</option>
+          <option value="kembali">Sudah kembali</option>
+          <option value="denda">Ada denda</option>
+        </select>
+      </div>
+      <div id="loanList"></div>
+    </section>
+
+    <section class="view" id="v-unduh" hidden></section>
+    <section class="view" id="v-atur" hidden></section>
+  </main>
+</div>
+
+<dialog id="dlg"></dialog>
+<div id="toast" role="status" hidden></div>
+<datalist id="dlTitles"></datalist>
+
+<script>
+(function(){
+'use strict';
+
+/* ============ Utilitas ============ */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function norm(s){return String(s||'').trim().replace(/\s+/g,' ').toLowerCase()}
+function rp(n){return 'Rp'+Number(n||0).toLocaleString('id-ID')}
+
+var mem={};
+var store={
+  get:function(k){try{return localStorage.getItem(k)}catch(e){return mem[k]!=null?mem[k]:null}},
+  set:function(k,v){try{localStorage.setItem(k,v);return true}catch(e){mem[k]=v;return false}},
+  del:function(k){try{localStorage.removeItem(k)}catch(e){delete mem[k]}}
+};
+var smem={};
+var sess={
+  get:function(k){try{return sessionStorage.getItem(k)}catch(e){return smem[k]!=null?smem[k]:null}},
+  set:function(k,v){try{sessionStorage.setItem(k,v)}catch(e){smem[k]=v}},
+  del:function(k){try{sessionStorage.removeItem(k)}catch(e){delete smem[k]}}
+};
+var storageOK=(function(){try{localStorage.setItem('gw_t','1');localStorage.removeItem('gw_t');return true}catch(e){return false}})();
+
+/* Tanggal */
+var BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function pad(n){return String(n).padStart(2,'0')}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function pd(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2],12)}
+function today(){return ymd(new Date())}
+function fd(s){if(!s)return '–';var d=pd(s);return d.getDate()+' '+BLN[d.getMonth()]+' '+d.getFullYear()}
+function stamp(){var d=new Date();return d.getDate()+' '+BLN[d.getMonth()]+' '+d.getFullYear()+', '+pad(d.getHours())+'.'+pad(d.getMinutes())}
+
+/* ============ Data ============ */
+function defaults(){return {v:1,books:[],loans:[],lastBackup:null,
+  settings:{petugas:'',hariSekolah:5,denda:1000,batas:7,modeDenda:'aktif',libur:[]}}}
+function load(){
+  var d=defaults();
+  try{
+    var r=store.get('gw_data');
+    if(r){var o=JSON.parse(r);
+      d.books=Array.isArray(o.books)?o.books:[];
+      d.loans=Array.isArray(o.loans)?o.loans:[];
+      d.lastBackup=o.lastBackup||null;
+      Object.assign(d.settings,o.settings||{});
+      if(!Array.isArray(d.settings.libur))d.settings.libur=[];
+    }
+  }catch(e){}
+  return d;
+}
+var S=load();
+function save(){
+  var ok=store.set('gw_data',JSON.stringify(S));
+  if(!ok)$('#storeWarn').hidden=false;
+}
+
+/* Hari aktif sekolah & denda */
+function isActive(d){
+  var w=d.getDay();
+  var wk=S.settings.hariSekolah==6?(w>=1&&w<=6):(w>=1&&w<=5);
+  return wk&&S.settings.libur.indexOf(ymd(d))<0;
+}
+function addActive(start,n){
+  var d=pd(start),c=0;
+  while(c<n){d.setDate(d.getDate()+1);if(isActive(d))c++}
+  return ymd(d);
+}
+function lateDays(batas,ret){
+  if(!batas||!ret||ret<=batas)return 0;
+  var a=pd(batas),b=pd(ret);
+  if(S.settings.modeDenda==='kalender')return Math.round((b-a)/864e5);
+  var c=0,d=new Date(a);
+  while(d<b){d.setDate(d.getDate()+1);if(isActive(d))c++}
+  return c;
+}
+function dendaAuto(batas,ret){return lateDays(batas,ret)*S.settings.denda}
+
+/* Katalog */
+function groups(){
+  var m=new Map();
+  S.books.forEach(function(b){
+    var k=norm(b.judul);
+    if(!m.has(k))m.set(k,{key:k,judul:b.judul.trim().replace(/\s+/g,' '),kodes:[],copies:[]});
+    var g=m.get(k);g.copies.push(b);
+    if(b.kode&&g.kodes.indexOf(b.kode)<0)g.kodes.push(b.kode);
+  });
+  return Array.from(m.values());
+}
+function borrowedMap(){
+  var m=new Map();
+  S.loans.forEach(function(l){if(!l.tglKembali)m.set(l.bookId,l)});
+  return m;
+}
+function parseInv(text){
+  var out=[],toks=String(text||'').split(/[\n,;]+/).map(function(t){return t.trim()}).filter(Boolean);
+  toks.forEach(function(t){
+    var m=t.match(/^(.*?)(\d+)\s*s\/d\s*(\d+)$/i);
+    if(m){
+      var a=parseInt(m[2],10),b=parseInt(m[3],10),w=m[2].length;
+      if(b>=a&&b-a<=999){for(var i=a;i<=b;i++)out.push(m[1]+String(i).padStart(w,'0'));return}
+    }
+    out.push(t);
+  });
+  return out;
+}
+
+/* ============ Antarmuka umum ============ */
+var tt;
+function toast(msg){
+  var t=$('#toast');t.textContent=msg;t.hidden=false;
+  clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},3200);
+}
+function modal(o){
+  var d=$('#dlg');
+  d.innerHTML='<form class="dlg-in" novalidate><header><h2>'+esc(o.title)+'</h2><button type="button" class="x" data-close aria-label="Tutup">×</button></header>'+
+    '<div class="dlg-body">'+o.body+'<p class="err" role="alert" hidden></p></div>'+
+    '<footer><button type="button" class="btn ghost" data-close>Batal</button>'+
+    (o.submit!==null?'<button class="btn '+(o.danger?'danger':'primary')+'">'+esc(o.submit||'Simpan')+'</button>':'')+'</footer></form>';
+  var f=d.querySelector('form');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var err=f.querySelector('.err');err.hidden=true;
+    Promise.resolve().then(function(){return o.onSubmit(f)}).then(function(r){
+      if(typeof r==='string'){err.textContent=r;err.hidden=false;return}
+      d.close();
+    }).catch(function(ex){err.textContent='Terjadi kesalahan: '+ex.message;err.hidden=false});
+  });
+  $$('[data-close]',d).forEach(function(b){b.onclick=function(){d.close()}});
+  d.showModal();
+  if(o.onOpen)o.onOpen(f);
+}
+$('#dlg').addEventListener('click',function(e){if(e.target===this)this.close()});
+function confirmBox(title,text,label,fn){
+  modal({title:title,body:'<p style="margin-top:0">'+text+'</p>',submit:label,danger:true,onSubmit:function(){fn()}});
+}
+
+/* ============ Berkas unduhan ============ */
+var DL=null;
+try{if(window.claude&&window.claude.use)window.claude.use('downloads').then(function(x){DL=x}).catch(function(){})}catch(e){}
+function saveFile(name,data){
+  if(DL){
+    DL.save({filename:name,data:data}).then(function(){toast('Berkas disimpan: '+name)}).catch(function(e){
+      if(e&&e.code==='declined')return;
+      toast('Berkas tidak dapat disimpan di tampilan ini.');
+    });
+    return;
+  }
+  try{
+    var blob=data instanceof Blob?data:new Blob([data]);
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+    toast('Mengunduh '+name);
+  }catch(e){toast('Berkas tidak dapat diunduh di tampilan ini.')}
+}
+function csvCell(v){
+  var s=String(v==null?'':v);
+  if(/^[=+\-@]/.test(s))s="'"+s;
+  return '"'+s.replace(/"/g,'""')+'"';
+}
+function toCsv(rows){return '\uFEFF'+rows.map(function(r){return r.map(csvCell).join(';')}).join('\r\n')}
+function fileStamp(){return today()}
+
+/* Baris data untuk unduhan */
+function rowsKatalog(){
+  var bm=borrowedMap();
+  var rows=[['No','Judul buku','No. inventaris','Kode buku','Status','Dipinjam oleh']];
+  var list=S.books.slice().sort(function(a,b){return a.judul.localeCompare(b.judul,'id')||String(a.noInv).localeCompare(String(b.noInv),'id',{numeric:true})});
+  list.forEach(function(b,i){
+    var l=bm.get(b.id);
+    rows.push([i+1,b.judul,b.noInv,b.kode,l?'Dipinjam':'Tersedia',l?l.peminjam:'']);
+  });
+  return rows;
+}
+function rowsRingkasan(){
+  var bm=borrowedMap();
+  var rows=[['No','Judul buku','Kode buku','Jumlah eksemplar','Dipinjam','Tersedia','No. inventaris']];
+  groups().sort(function(a,b){return a.judul.localeCompare(b.judul,'id')}).forEach(function(g,i){
+    var dp=g.copies.filter(function(c){return bm.has(c.id)}).length;
+    rows.push([i+1,g.judul,g.kodes.join(' / '),g.copies.length,dp,g.copies.length-dp,
+      g.copies.map(function(c){return c.noInv}).sort(function(a,b){return String(a).localeCompare(String(b),'id',{numeric:true})}).join(', ')]);
+  });
+  return rows;
+}
+function loanInfo(l){
+  var td=today();
+  if(l.tglKembali){
+    var late=lateDays(l.tglBatas,l.tglKembali);
+    return {late:late,denda:l.denda||0,status:late>0||l.denda>0?'Dikembalikan terlambat':'Dikembalikan',kind:late>0||l.denda>0?'warn':'ok',active:false};
+  }
+  var lt=lateDays(l.tglBatas,td);
+  return {late:lt,denda:lt*S.settings.denda,status:lt>0?'Terlambat':'Dipinjam',kind:lt>0?'bad':'neu',active:true};
+}
+function rowsPinjam(){
+  var rows=[['No','Nama peminjam','Kelas/keterangan','Judul buku','No. inventaris','Kode buku','Tanggal pinjam','Batas pengembalian','Tanggal kembali','Hari terlambat','Denda (Rp)','Status']];
+  sortedLoans().forEach(function(l,i){
+    var x=loanInfo(l);
+    rows.push([i+1,l.peminjam,l.kelas||'',l.judul,l.noInv,l.kode,fd(l.tglPinjam),fd(l.tglBatas),l.tglKembali?fd(l.tglKembali):'',x.late,x.denda,x.status]);
+  });
+  return rows;
+}
+function sortedLoans(){
+  return S.loans.slice().sort(function(a,b){
+    var aa=a.tglKembali?1:0,bb=b.tglKembali?1:0;
+    if(aa!==bb)return aa-bb;
+    if(!aa)return a.tglBatas<b.tglBatas?-1:a.tglBatas>b.tglBatas?1:0;
+    return a.tglPinjam<b.tglPinjam?1:a.tglPinjam>b.tglPinjam?-1:0;
+  });
+}
+function downloadSheets(which){
+  var sets={
+    katalog:[['Katalog',rowsKatalog()],['Ringkasan judul',rowsRingkasan()]],
+    pinjam:[['Peminjaman',rowsPinjam()]]
+  };
+  sets.semua=sets.katalog.concat(sets.pinjam);
+  var names={katalog:'katalog-buku',pinjam:'peminjaman-buku',semua:'data-perpustakaan'};
+  var list=sets[which];
+  if(typeof XLSX!=='undefined'){
+    try{
+      var wb=XLSX.utils.book_new();
+      list.forEach(function(s){
+        var ws=XLSX.utils.aoa_to_sheet(s[1]);
+        ws['!cols']=s[1][0].map(function(_,ci){
+          var w=10;s[1].forEach(function(r){w=Math.max(w,Math.min(48,String(r[ci]==null?'':r[ci]).length+2))});return {wch:w};
+        });
+        XLSX.utils.book_append_sheet(wb,ws,s[0]);
+      });
+      var buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+      saveFile(names[which]+'-'+fileStamp()+'.xlsx',buf);
+      return;
+    }catch(e){}
+  }
+  // cadangan: CSV (satu berkas untuk set pertama)
+  saveFile(names[which]+'-'+fileStamp()+'.csv',toCsv(list[0][1]));
+  if(list.length>1)toast('Excel tidak tersedia; hanya lembar pertama yang diunduh sebagai CSV.');
+}
+
+/* Cetak / bukti HTML */
+var PRINT_CSS='body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:24px;font-size:12px}h1{font-size:18px;margin:0}h2{font-size:14px;margin:18px 0 6px}.head{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}.head p{margin:2px 0}table{border-collapse:collapse;width:100%}th,td{border:1px solid #444;padding:4px 6px;text-align:left;vertical-align:top}th{background:#eee}.r{text-align:right}.sig{margin-top:40px;display:flex;justify-content:flex-end}.sig div{text-align:center;width:220px}.kv td{border:0;padding:3px 6px}.kv td:first-child{width:190px;color:#444}@media print{body{margin:10mm}}';
+function htmlHead(title){
+  return '<div class="head"><h1>PERPUSTAKAAN GUNA WIDYA</h1><p>SMA Negeri 1 Sukasada</p><p><b>'+esc(title)+'</b></p></div>';
+}
+function htmlTable(rows,rightCols){
+  rightCols=rightCols||[];
+  return '<table><thead><tr>'+rows[0].map(function(h){return '<th>'+esc(h)+'</th>'}).join('')+'</tr></thead><tbody>'+
+    rows.slice(1).map(function(r){return '<tr>'+r.map(function(c,i){return '<td'+(rightCols.indexOf(i)>=0?' class="r"':'')+'>'+esc(c)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table>';
+}
+function sigBlock(){
+  return '<div class="sig"><div>Sukasada, '+esc(fd(today()))+'<br>Petugas Perpustakaan<br><br><br><br>('+esc(S.settings.petugas||'............................')+')</div></div>';
+}
+function downloadReport(){
+  var tot=0;S.loans.forEach(function(l){tot+=loanInfo(l).denda});
+  var bm=borrowedMap();
+  var html='<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Laporan Perpustakaan Guna Widya</title><style>'+PRINT_CSS+'</style></head><body>'+
+    htmlHead('Laporan Data Perpustakaan – dicetak '+stamp())+
+    '<p>Jumlah judul: <b>'+groups().length+'</b> &nbsp;|&nbsp; Jumlah eksemplar: <b>'+S.books.length+'</b> &nbsp;|&nbsp; Sedang dipinjam: <b>'+bm.size+'</b> &nbsp;|&nbsp; Tersedia: <b>'+(S.books.length-bm.size)+'</b></p>'+
+    '<h2>A. Katalog buku (per judul)</h2>'+htmlTable(rowsRingkasan(),[3,4,5])+
+    '<h2>B. Daftar eksemplar</h2>'+htmlTable(rowsKatalog())+
+    '<h2>C. Catatan peminjaman dan denda</h2>'+htmlTable(rowsPinjam(),[9,10])+
+    '<p>Total denda (tercatat dan berjalan): <b>'+esc(rp(tot))+'</b></p>'+sigBlock()+'</body></html>';
+  saveFile('laporan-perpustakaan-'+fileStamp()+'.html',html);
+}
+function downloadSlip(id){
+  var l=S.loans.find(function(x){return x.id===id});if(!l)return;
+  var x=loanInfo(l);
+  var rows=[
+    ['Nama peminjam',l.peminjam],['Kelas/keterangan',l.kelas||'–'],['Judul buku',l.judul],
+    ['No. inventaris',l.noInv],['Kode buku',l.kode],['Tanggal pinjam',fd(l.tglPinjam)],
+    ['Batas pengembalian',fd(l.tglBatas)],['Tanggal kembali',l.tglKembali?fd(l.tglKembali):'Belum dikembalikan'],
+    ['Hari terlambat',x.late+' hari'],['Denda',rp(x.denda)+(x.active&&x.denda?' (berjalan per '+fd(today())+')':'')],['Status',x.status]
+  ];
+  var html='<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Bukti</title><style>'+PRINT_CSS+'</style></head><body>'+
+    htmlHead(l.tglKembali?'BUKTI PENGEMBALIAN BUKU':'BUKTI PEMINJAMAN BUKU')+
+    '<table class="kv">'+rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>: '+esc(r[1])+'</td></tr>'}).join('')+'</table>'+
+    '<p style="margin-top:16px;color:#444">Denda Rp'+Number(S.settings.denda).toLocaleString('id-ID')+' per hari bila melewati batas '+S.settings.batas+' hari aktif sekolah.</p>'+
+    '<div class="sig" style="justify-content:space-between"><div>Peminjam<br><br><br><br>('+esc(l.peminjam)+')</div>'+sigBlock().replace('<div class="sig">','').replace(/<\/div>$/,'')+'</div></body></html>';
+  saveFile('bukti-'+norm(l.peminjam).replace(/[^a-z0-9]+/g,'-').slice(0,30)+'-'+String(l.noInv).replace(/[^A-Za-z0-9]+/g,'')+'.html',html);
+}
+function downloadBackup(){
+  S.lastBackup=new Date().toISOString();save();
+  saveFile('cadangan-perpustakaan-'+fileStamp()+'.json',JSON.stringify({app:'guna-widya',exported:S.lastBackup,books:S.books,loans:S.loans,settings:S.settings},null,1));
+  renderUnduh();
+}
+
+/* ============ Masuk petugas ============ */
+var AK='gw_auth';
+function getAuth(){try{return JSON.parse(store.get(AK))}catch(e){return null}}
+function sha(s,salt){
+  var data=new TextEncoder().encode(salt+':'+s);
+  if(window.crypto&&crypto.subtle){
+    return crypto.subtle.digest('SHA-256',data).then(function(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return x.toString(16).padStart(2,'0')}).join('')});
+  }
+  var h=5381;for(var i=0;i<data.length;i++)h=((h<<5)+h+data[i])>>>0;
+  return Promise.resolve('f'+h.toString(16));
+}
+function randSalt(n){
+  var a=new Uint8Array(n);
+  if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(var i=0;i<n;i++)a[i]=Math.floor(Math.random()*256);
+  return Array.prototype.map.call(a,function(x){return x.toString(16).padStart(2,'0')}).join('');
+}
+function newRecovery(){
+  var al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',a=new Uint8Array(10),s='';
+  if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(var i=0;i<10;i++)a[i]=Math.floor(Math.random()*256);
+  for(var j=0;j<10;j++){s+=al[a[j]%al.length];if(j===4)s+='-'}
+  return s;
+}
+function cleanRec(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'')}
+var chal={a:0,b:0},fails=0;
+function newChal(){chal={a:2+Math.floor(Math.random()*8),b:2+Math.floor(Math.random()*8)}}
+function gateErr(msg){var e=$('#gate .err');e.textContent=msg;e.hidden=false}
+
+function showGate(mode,extra){
+  $('#main').hidden=true;
+  var g=$('#gate');g.hidden=false;
+  var h='<div class="gate-card"><h1>Perpustakaan Guna Widya</h1><p class="sub">SMA Negeri 1 Sukasada</p>';
+  if(mode==='setup'){
+    h+='<form id="gf" novalidate><h2 style="font-size:1.1rem;margin-bottom:6px">Buat akun petugas</h2><p class="hint" style="margin-top:0">Hanya petugas yang memegang PIN ini yang dapat mengisi dan mengubah data.</p>'+
+      '<label>Nama petugas<input name="nama" autocomplete="name" required></label>'+
+      '<label>PIN (minimal 4 karakter)<input name="pin" type="password" autocomplete="new-password" required></label>'+
+      '<label>Ulangi PIN<input name="pin2" type="password" autocomplete="new-password" required></label>'+
+      '<p class="err" role="alert" hidden></p><button class="btn primary block">Simpan dan lanjut</button></form>';
+  }else if(mode==='recovery'){
+    h+='<h2 style="font-size:1.1rem">Simpan kode pemulihan</h2><p class="hint" style="margin-top:6px">Catat kode ini di tempat aman. Kode dipakai bila PIN lupa dan hanya ditampilkan sekali.</p><div class="recovery">'+esc(extra)+'</div><button class="btn primary block" id="gcont">Saya sudah mencatatnya</button>';
+  }else if(mode==='reset'){
+    h+='<form id="gf" novalidate><h2 style="font-size:1.1rem;margin-bottom:6px">Atur ulang PIN</h2>'+
+      '<label>Kode pemulihan<input name="rec" autocomplete="off" required></label>'+
+      '<label>PIN baru<input name="pin" type="password" autocomplete="new-password" required></label>'+
+      '<label>Ulangi PIN baru<input name="pin2" type="password" autocomplete="new-password" required></label>'+
+      '<p class="err" role="alert" hidden></p><button class="btn primary block">Atur ulang PIN</button><p style="text-align:center;margin:12px 0 0"><button type="button" class="linkbtn" id="gback">Kembali ke halaman masuk</button></p></form>';
+  }else{
+    newChal();
+    h+='<form id="gf" novalidate><label>PIN petugas<input name="pin" type="password" autocomplete="current-password" required></label>'+
+      '<label>Pemeriksaan manusia: berapa hasil '+chal.a+' + '+chal.b+'?<input name="chk" inputmode="numeric" autocomplete="off" required></label>'+
+      '<p class="err" role="alert" hidden></p><button class="btn primary block">Masuk</button><p style="text-align:center;margin:12px 0 0"><button type="button" class="linkbtn" id="greset">Lupa PIN?</button></p></form>';
+  }
+  h+='</div>';
+  g.innerHTML=h;
+  var f=$('#gf');
+  if(f){
+    var first=f.elements[0];if(first)first.focus();
+    f.addEventListener('submit',function(e){e.preventDefault();submitGate(mode,f)});
+  }
+  if($('#gcont'))$('#gcont').onclick=enter;
+  if($('#greset'))$('#greset').onclick=function(){showGate('reset')};
+  if($('#gback'))$('#gback').onclick=function(){showGate('login')};
+}
+function submitGate(mode,f){
+  var E=f.elements;
+  if(mode==='setup'){
+    var nama=E.nama.value.trim();
+    if(!nama)return gateErr('Isi nama petugas.');
+    if(E.pin.value.length<4)return gateErr('PIN minimal 4 karakter.');
+    if(E.pin.value!==E.pin2.value)return gateErr('Kedua PIN tidak sama.');
+    var salt=randSalt(8),rs=randSalt(8),rec=newRecovery();
+    Promise.all([sha(E.pin.value,salt),sha(cleanRec(rec),rs)]).then(function(h){
+      store.set(AK,JSON.stringify({salt:salt,hash:h[0],rs:rs,rh:h[1]}));
+      S.settings.petugas=nama;save();
+      sess.set('gw_ok','1');
+      showGate('recovery',rec);
+    });
+  }else if(mode==='reset'){
+    var a=getAuth();
+    if(!a)return;
+    if(E.pin.value.length<4)return gateErr('PIN baru minimal 4 karakter.');
+    if(E.pin.value!==E.pin2.value)return gateErr('Kedua PIN tidak sama.');
+    sha(cleanRec(E.rec.value),a.rs).then(function(h){
+      if(h!==a.rh)return gateErr('Kode pemulihan tidak cocok.');
+      var salt=randSalt(8);
+      return sha(E.pin.value,salt).then(function(ph){
+        a.salt=salt;a.hash=ph;store.set(AK,JSON.stringify(a));
+        sess.set('gw_ok','1');enter();toast('PIN berhasil diatur ulang.');
+      });
+    });
+  }else{
+    var lock=+store.get('gw_lock')||0;
+    if(Date.now()<lock)return gateErr('Terlalu banyak percobaan. Coba lagi dalam '+Math.ceil((lock-Date.now())/1000)+' detik.');
+    if(String(E.chk.value).trim()===''||+E.chk.value!==chal.a+chal.b){
+      showGate('login');gateErr('Jawaban penjumlahan salah. Coba soal yang baru.');return;
+    }
+    var au=getAuth();
+    sha(E.pin.value,au.salt).then(function(h){
+      if(h!==au.hash){
+        fails++;
+        if(fails>=5){fails=0;store.set('gw_lock',String(Date.now()+60000));}
+        showGate('login');gateErr(Date.now()<(+store.get('gw_lock')||0)?'Terlalu banyak percobaan. Tunggu 1 menit.':'PIN salah.');return;
+      }
+      fails=0;sess.set('gw_ok','1');enter();
+    });
+  }
+}
+function enter(){
+  $('#gate').hidden=true;$('#main').hidden=false;
+  $('#whoName').textContent=S.settings.petugas||'Petugas';
+  if(!storageOK)$('#storeWarn').hidden=false;
+  renderAll();
+}
+$('#btnLogout').onclick=function(){sess.del('gw_ok');showGate('login')};
+
+/* ============ Navigasi ============ */
+var tab='katalog';
+function setTab(t){
+  tab=t;
+  $$('nav.tabs button').forEach(function(b){b.setAttribute('aria-selected',b.dataset.tab===t?'true':'false')});
+  ['katalog','pinjam','unduh','atur'].forEach(function(k){$('#v-'+k).hidden=k!==t});
+  renderAll();window.scrollTo(0,0);
+}
+$$('nav.tabs button').forEach(function(b){b.onclick=function(){setTab(b.dataset.tab)}});
+
+function renderAll(){
+  $('#whoName').textContent=S.settings.petugas||'Petugas';
+  var dl=$('#dlTitles');
+  dl.innerHTML=groups().map(function(g){return '<option value="'+esc(g.judul)+'">'}).join('');
+  if(tab==='katalog')renderCatalog();
+  else if(tab==='pinjam')renderLoans();
+  else if(tab==='unduh')renderUnduh();
+  else renderAtur();
+}
+
+/* ============ Katalog ============ */
+var catQ='',catLimit=40,openSet=new Set();
+$('#catQ').addEventListener('input',function(){catQ=this.value;catLimit=40;renderCatalog()});
+function badge(t,k){return '<span class="badge '+k+'">'+esc(t)+'</span>'}
+
+function renderCatalog(){
+  var gs=groups(),bm=borrowedMap();
+  var dp=0;S.books.forEach(function(b){if(bm.has(b.id))dp++});
+  $('#stats').innerHTML=
+    '<div class="stat"><b>'+gs.length+'</b><span>Jumlah judul</span></div>'+
+    '<div class="stat"><b>'+S.books.length+'</b><span>Jumlah eksemplar</span></div>'+
+    '<div class="stat"><b>'+(S.books.length-dp)+'</b><span>Tersedia</span></div>'+
+    '<div class="stat"><b>'+dp+'</b><span>Sedang dipinjam</span></div>';
+  var q=norm(catQ),list=gs;
+  if(q)list=gs.filter(function(g){return g.key.indexOf(q)>=0||g.copies.some(function(c){return norm(c.noInv).indexOf(q)>=0||norm(c.kode).indexOf(q)>=0})});
+  list.sort(function(a,b){return a.judul.localeCompare(b.judul,'id')});
+  var box=$('#catList');
+  if(!S.books.length){box.innerHTML='<div class="empty">Katalog masih kosong. Pilih <b>Tambah buku</b> untuk mencatat buku pertama.</div>';return}
+  if(!list.length){box.innerHTML='<div class="empty">Tidak ada buku yang cocok dengan pencarian.</div>';return}
+  var html='<div style="display:grid;gap:10px">';
+  list.slice(0,catLimit).forEach(function(g){
+    var n=g.copies.length,d=g.copies.filter(function(c){return bm.has(c.id)}).length,open=openSet.has(g.key);
+    html+='<article class="grp'+(open?' open':'')+'"><button type="button" class="grp-head" data-act="toggle" data-key="'+esc(g.key)+'" aria-expanded="'+open+'">'+
+      '<svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>'+
+      '<div class="grp-title"><h3>'+esc(g.judul)+'</h3><p>Kode: '+esc(g.kodes.join(' / ')||'–')+'</p></div>'+
+      '<div class="counts">'+badge(n+' eksemplar','neu')+badge('Stok '+(n-d),n-d>0?'ok':'bad')+'</div></button>';
+    if(open){
+      html+='<div class="grp-body"><div class="grp-actions">'+
+        '<button class="btn sm" type="button" data-act="addcopy" data-key="'+esc(g.key)+'">+ Tambah eksemplar</button>'+
+        '<button class="btn sm" type="button" data-act="editgrp" data-key="'+esc(g.key)+'">Edit judul &amp; kode</button>'+
+        '<button class="btn sm" type="button" data-act="delgrp" data-key="'+esc(g.key)+'">Hapus judul</button></div>'+
+        '<div class="tbl-wrap"><table class="resp"><thead><tr><th>No. inventaris</th><th>Kode buku</th><th>Status</th><th></th></tr></thead><tbody>';
+      g.copies.slice().sort(function(a,b){return String(a.noInv).localeCompare(String(b.noInv),'id',{numeric:true})}).forEach(function(c){
+        var l=bm.get(c.id);
+        html+='<tr><td data-l="No. inventaris">'+esc(c.noInv)+'</td><td data-l="Kode buku">'+esc(c.kode)+'</td>'+
+          '<td data-l="Status">'+(l?badge('Dipinjam: '+l.peminjam,'warn'):badge('Tersedia','ok'))+'</td>'+
+          '<td class="full"><div class="acts"><button class="btn sm" type="button" data-act="editcopy" data-id="'+esc(c.id)+'">Edit</button>'+
+          '<button class="btn sm" type="button" data-act="delcopy" data-id="'+esc(c.id)+'">Hapus</button></div></td></tr>';
+      });
+      html+='</tbody></table></div></div>';
+    }
+    html+='</article>';
+  });
+  html+='</div>';
+  if(list.length>catLimit)html+='<p style="text-align:center"><button class="btn" type="button" data-act="more">Tampilkan lebih banyak ('+(list.length-catLimit)+' judul lagi)</button></p>';
+  box.innerHTML=html;
+}
+
+$('#v-katalog').addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.dataset.act,key=t.dataset.key,id=t.dataset.id;
+  if(a==='toggle'){openSet.has(key)?openSet.delete(key):openSet.add(key);renderCatalog();}
+  else if(a==='more'){catLimit+=40;renderCatalog()}
+  else if(a==='addbook')bookAddDialog({});
+  else if(a==='addcopy'){var g=groups().find(function(x){return x.key===key});if(g)bookAddDialog({judul:g.judul,kode:g.kodes[0]||''})}
+  else if(a==='editgrp')groupEditDialog(key);
+  else if(a==='delgrp')groupDelete(key);
+  else if(a==='editcopy')copyEditDialog(id);
+  else if(a==='delcopy')copyDelete(id);
+});
+
+function bookAddDialog(pre){
+  modal({title:'Tambah buku',submit:'Simpan ke katalog',
+    body:'<label>Judul buku<input name="judul" list="dlTitles" autocomplete="off" required value="'+esc(pre.judul||'')+'"></label><p class="hint" id="jInfo"></p>'+
+      '<label>Nomor inventaris<textarea name="inv" rows="3" placeholder="Satu eksemplar: 0101&#10;Beberapa: 0101, 0102, 0103&#10;Rentang: 0101 s/d 0105"></textarea></label><p class="hint" id="iInfo">Satu nomor inventaris sama dengan satu eksemplar.</p>'+
+      '<label>Kode buku<input name="kode" autocomplete="off" required value="'+esc(pre.kode||'')+'"></label>',
+    onOpen:function(f){
+      var E=f.elements;
+      function upd(){
+        var g=groups().find(function(x){return x.key===norm(E.judul.value)});
+        var j=$('#jInfo',f);
+        if(g){
+          j.className='hint info';j.textContent='Judul sudah ada ('+g.copies.length+' eksemplar). Buku baru akan otomatis menambah jumlah eksemplar.';
+          if(!E.kode.value&&g.kodes[0])E.kode.value=g.kodes[0];
+        }else{j.className='hint';j.textContent=E.judul.value.trim()?'Judul baru akan ditambahkan ke katalog.':''}
+        var n=parseInv(E.inv.value).length;
+        $('#iInfo',f).textContent=n?('Akan ditambahkan '+n+' eksemplar.'):'Satu nomor inventaris sama dengan satu eksemplar.';
+      }
+      E.judul.addEventListener('input',upd);E.inv.addEventListener('input',upd);upd();
+      (pre.judul?E.inv:E.judul).focus();
+    },
+    onSubmit:function(f){
+      var E=f.elements,judul=E.judul.value.trim().replace(/\s+/g,' '),kode=E.kode.value.trim();
+      if(!judul)return 'Isi judul buku.';
+      var invs=parseInv(E.inv.value);
+      if(!invs.length)return 'Isi minimal satu nomor inventaris.';
+      if(!kode)return 'Isi kode buku.';
+      var exist=new Set(S.books.map(function(b){return norm(b.noInv)})),seen=new Set(),dup=[];
+      invs.forEach(function(v){var k=norm(v);if(exist.has(k)||seen.has(k))dup.push(v);seen.add(k)});
+      if(dup.length)return 'Nomor inventaris sudah dipakai atau terulang: '+dup.slice(0,6).join(', ')+(dup.length>6?', …':'')+'.';
+      var g=groups().find(function(x){return x.key===norm(judul)});
+      var title=g?g.judul:judul;
+      invs.forEach(function(v){S.books.push({id:uid(),judul:title,noInv:v,kode:kode,dibuat:Date.now()})});
+      save();openSet.add(norm(title));renderAll();
+      toast(invs.length+' eksemplar ditambahkan.');
+    }});
+}
+function copyEditDialog(id){
+  var b=S.books.find(function(x){return x.id===id});if(!b)return;
+  modal({title:'Edit eksemplar',
+    body:'<label>Judul buku<input name="judul" list="dlTitles" required value="'+esc(b.judul)+'"></label>'+
+      '<label>Nomor inventaris<input name="inv" required value="'+esc(b.noInv)+'"></label>'+
+      '<label>Kode buku<input name="kode" required value="'+esc(b.kode)+'"></label>',
+    onSubmit:function(f){
+      var E=f.elements,judul=E.judul.value.trim().replace(/\s+/g,' '),inv=E.inv.value.trim(),kode=E.kode.value.trim();
+      if(!judul||!inv||!kode)return 'Judul, nomor inventaris, dan kode buku wajib diisi.';
+      if(S.books.some(function(x){return x.id!==id&&norm(x.noInv)===norm(inv)}))return 'Nomor inventaris itu sudah dipakai eksemplar lain.';
+      var g=groups().find(function(x){return x.key===norm(judul)&&x.copies.some(function(c){return c.id!==id})});
+      b.judul=g?g.judul:judul;b.noInv=inv;b.kode=kode;
+      S.loans.forEach(function(l){if(l.bookId===id){l.judul=b.judul;l.noInv=b.noInv;l.kode=b.kode}});
+      save();openSet.add(norm(b.judul));renderAll();toast('Perubahan disimpan.');
+    }});
+}
+function groupEditDialog(key){
+  var g=groups().find(function(x){return x.key===key});if(!g)return;
+  modal({title:'Edit judul dan kode',
+    body:'<p class="hint" style="margin-top:0">Perubahan berlaku untuk semua '+g.copies.length+' eksemplar judul ini.</p>'+
+      '<label>Judul buku<input name="judul" required value="'+esc(g.judul)+'"></label>'+
+      '<label>Kode buku<input name="kode" required value="'+esc(g.kodes[0]||'')+'"></label>',
+    onSubmit:function(f){
+      var E=f.elements,judul=E.judul.value.trim().replace(/\s+/g,' '),kode=E.kode.value.trim();
+      if(!judul||!kode)return 'Judul dan kode buku wajib diisi.';
+      var other=groups().find(function(x){return x.key===norm(judul)&&x.key!==key});
+      var title=other?other.judul:judul;
+      var ids=g.copies.map(function(c){return c.id});
+      g.copies.forEach(function(c){c.judul=title;c.kode=kode});
+      S.loans.forEach(function(l){if(ids.indexOf(l.bookId)>=0){l.judul=title;l.kode=kode}});
+      save();openSet.delete(key);openSet.add(norm(title));renderAll();
+      toast(other?'Disimpan dan digabung dengan judul yang sama.':'Perubahan disimpan.');
+    }});
+}
+function copyDelete(id){
+  var b=S.books.find(function(x){return x.id===id});if(!b)return;
+  if(borrowedMap().has(id)){toast('Buku ini sedang dipinjam. Catat pengembaliannya dulu.');return}
+  confirmBox('Hapus eksemplar?','Eksemplar <b>'+esc(b.judul)+'</b> (no. inventaris '+esc(b.noInv)+') akan dihapus dari katalog. Catatan peminjaman lama tetap tersimpan.','Hapus',function(){
+    S.books=S.books.filter(function(x){return x.id!==id});save();renderAll();toast('Eksemplar dihapus.');
+  });
+}
+function groupDelete(key){
+  var g=groups().find(function(x){return x.key===key});if(!g)return;
+  var bm=borrowedMap();
+  if(g.copies.some(function(c){return bm.has(c.id)})){toast('Ada eksemplar judul ini yang sedang dipinjam. Catat pengembaliannya dulu.');return}
+  confirmBox('Hapus judul?','Semua <b>'+g.copies.length+' eksemplar</b> dari <b>'+esc(g.judul)+'</b> akan dihapus dari katalog. Catatan peminjaman lama tetap tersimpan.','Hapus judul',function(){
+    var ids=g.copies.map(function(c){return c.id});
+    S.books=S.books.filter(function(x){return ids.indexOf(x.id)<0});save();renderAll();toast('Judul dihapus.');
+  });
+}
+
+/* ============ Peminjaman ============ */
+var loanQ='',loanF='all';
+$('#loanQ').addEventListener('input',function(){loanQ=this.value;renderLoans()});
+$('#loanF').addEventListener('change',function(){loanF=this.value;renderLoans()});
+
+function renderLoans(){
+  var aktif=0,telat=0,dendaTercatat=0,dendaJalan=0;
+  S.loans.forEach(function(l){
+    var x=loanInfo(l);
+    if(x.active){aktif++;if(x.late>0)telat++;dendaJalan+=x.denda}else dendaTercatat+=x.denda;
+  });
+  $('#loanStats').innerHTML='<span>Sedang dipinjam <b>'+aktif+'</b></span><span>Terlambat <b>'+telat+'</b></span><span>Denda sudah tercatat <b>'+esc(rp(dendaTercatat))+'</b></span><span>Denda berjalan <b>'+esc(rp(dendaJalan))+'</b></span>';
+  var q=norm(loanQ);
+  var list=sortedLoans().filter(function(l){
+    var x=loanInfo(l);
+    if(loanF==='aktif'&&!x.active)return false;
+    if(loanF==='telat'&&!(x.active&&x.late>0))return false;
+    if(loanF==='kembali'&&x.active)return false;
+    if(loanF==='denda'&&!(x.denda>0))return false;
+    if(q&&[l.peminjam,l.kelas,l.judul,l.noInv,l.kode].join(' ').toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  var box=$('#loanList');
+  if(!S.loans.length){box.innerHTML='<div class="empty">Belum ada catatan peminjaman. Pilih <b>Catat peminjaman</b> untuk memulai.</div>';return}
+  if(!list.length){box.innerHTML='<div class="empty">Tidak ada catatan yang cocok.</div>';return}
+  var h='<div class="tbl-wrap"><table class="resp"><thead><tr><th>Peminjam</th><th>Buku</th><th>Pinjam</th><th>Batas</th><th>Kembali</th><th class="num">Denda</th><th>Status</th><th></th></tr></thead><tbody>';
+  list.forEach(function(l){
+    var x=loanInfo(l);
+    h+='<tr><td data-l="Peminjam"><b>'+esc(l.peminjam)+'</b>'+(l.kelas?'<br><span class="muted">'+esc(l.kelas)+'</span>':'')+'</td>'+
+      '<td data-l="Buku">'+esc(l.judul)+'<br><span class="muted">Inv. '+esc(l.noInv)+' · Kode '+esc(l.kode)+'</span></td>'+
+      '<td data-l="Pinjam">'+esc(fd(l.tglPinjam))+'</td><td data-l="Batas">'+esc(fd(l.tglBatas))+'</td>'+
+      '<td data-l="Kembali">'+esc(fd(l.tglKembali))+'</td>'+
+      '<td data-l="Denda" class="num">'+(x.denda?esc(rp(x.denda))+(x.late?'<br><span class="muted">'+x.late+' hari</span>':''):'–')+'</td>'+
+      '<td data-l="Status">'+badge(x.status,x.kind)+'</td>'+
+      '<td class="full"><div class="acts">'+(x.active?'<button class="btn sm primary" type="button" data-act="ret" data-id="'+esc(l.id)+'">Kembalikan</button>':'')+
+      '<button class="btn sm" type="button" data-act="editloan" data-id="'+esc(l.id)+'">Edit</button>'+
+      '<button class="btn sm" type="button" data-act="slip" data-id="'+esc(l.id)+'">Bukti</button>'+
+      '<button class="btn sm" type="button" data-act="delloan" data-id="'+esc(l.id)+'">Hapus</button></div></td></tr>';
+  });
+  h+='</tbody></table></div>';
+  box.innerHTML=h;
+}
+$('#v-pinjam').addEventListener('click',function(e){
+  var t=e.target.closest('[data-act]');if(!t)return;
+  var a=t.dataset.act,id=t.dataset.id;
+  if(a==='addloan'){
+    if(!S.books.length){toast('Isi katalog buku terlebih dahulu.');return}
+    loanDialog(null);
+  }
+  else if(a==='ret')returnDialog(id);
+  else if(a==='editloan')loanDialog(id);
+  else if(a==='slip')downloadSlip(id);
+  else if(a==='delloan'){
+    var l=S.loans.find(function(x){return x.id===id});if(!l)return;
+    confirmBox('Hapus catatan peminjaman?','Catatan <b>'+esc(l.peminjam)+'</b> untuk buku <b>'+esc(l.judul)+'</b> akan dihapus permanen. Unduh cadangan lebih dulu bila perlu.','Hapus',function(){
+      S.loans=S.loans.filter(function(x){return x.id!==id});save();renderAll();toast('Catatan dihapus.');
+    });
+  }
+});
+
+function calcText(batas,kembali,manual){
+  if(!kembali)return 'Denda dihitung saat buku dikembalikan.';
+  var late=lateDays(batas,kembali);
+  if(!late)return 'Tepat waktu. Denda <b>Rp0</b>.';
+  return 'Terlambat <b>'+late+' hari'+(S.settings.modeDenda==='kalender'?'':' aktif')+'</b> × '+esc(rp(S.settings.denda))+' = <b>'+esc(rp(late*S.settings.denda))+'</b>'+(manual?' (diganti manual di bawah)':'');
+}
+
+function loanDialog(id){
+  var L=id?S.loans.find(function(x){return x.id===id}):null;
+  if(id&&!L)return;
+  var td=today();
+  var v={nama:L?L.peminjam:'',kelas:L?L.kelas||'':'',tp:L?L.tglPinjam:td,tb:L?L.tglBatas:addActive(td,S.settings.batas),
+    bAuto:L?!L.batasManual:true,tk:L?L.tglKembali||'':'',dm:L?!!L.dendaManual:false,dv:L?L.denda||0:0};
+  modal({title:L?'Edit peminjaman':'Catat peminjaman',submit:L?'Simpan perubahan':'Simpan peminjaman',
+    body:'<label>Buku<input name="q" autocomplete="off" placeholder="Ketik judul, no. inventaris, atau kode buku"></label>'+
+      '<div class="pk-sel" hidden></div><div class="pk-list"></div>'+
+      '<div class="row2"><label>Nama peminjam<input name="nama" required autocomplete="off" value="'+esc(v.nama)+'"></label>'+
+      '<label>Kelas / keterangan<input name="kelas" autocomplete="off" placeholder="Contoh: XI IPA 2" value="'+esc(v.kelas)+'"></label></div>'+
+      '<div class="row2"><label>Tanggal pinjam<input type="date" name="tp" required value="'+v.tp+'"></label>'+
+      '<label>Batas pengembalian<input type="date" name="tb" required value="'+v.tb+'"></label></div>'+
+      '<label class="chk"><input type="checkbox" name="bauto"'+(v.bAuto?' checked':'')+'> Hitung otomatis: '+S.settings.batas+' hari aktif sekolah</label>'+
+      '<label>Tanggal kembali (kosongkan jika belum kembali)<input type="date" name="tk" value="'+v.tk+'"></label>'+
+      '<div class="calc" id="calc"></div>'+
+      '<label class="chk"><input type="checkbox" name="dman"'+(v.dm?' checked':'')+'> Isi denda manual</label>'+
+      '<label>Jumlah denda (Rp)<input type="number" name="dval" min="0" step="500" value="'+v.dv+'"></label>',
+    onOpen:function(f){
+      var E=f.elements,sel=L?L.bookId:null;
+      var sBox=$('.pk-sel',f),list=$('.pk-list',f);
+      function cur(){return S.books.find(function(b){return b.id===sel})}
+      function showSel(){
+        var b=cur();
+        if(b){sBox.hidden=false;E.q.closest('label').hidden=true;list.innerHTML='';
+          sBox.innerHTML='<div><b>'+esc(b.judul)+'</b><small>Inv. '+esc(b.noInv)+' · Kode '+esc(b.kode)+'</small></div><button type="button" class="btn sm" data-chg>Ganti</button>';
+          $('[data-chg]',sBox).onclick=function(){sel=null;showSel();E.q.value='';E.q.focus()};
+        }else{sBox.hidden=true;E.q.closest('label').hidden=false}
+      }
+      function results(){
+        var q=norm(E.q.value);list.innerHTML='';
+        if(!q)return [];
+        var bm=borrowedMap();
+        var res=S.books.filter(function(b){
+          if(bm.has(b.id)&&b.id!==(L&&L.bookId))return false;
+          return norm(b.judul+' '+b.noInv+' '+b.kode).indexOf(q)>=0;
+        }).sort(function(a,b){
+          var ea=norm(a.noInv)===q||norm(a.kode)===q?0:1,eb=norm(b.noInv)===q||norm(b.kode)===q?0:1;
+          return ea-eb||a.judul.localeCompare(b.judul,'id');
+        });
+        list.innerHTML=res.slice(0,8).map(function(b){return '<button type="button" data-id="'+esc(b.id)+'">'+esc(b.judul)+'<small>Inv. '+esc(b.noInv)+' · Kode '+esc(b.kode)+'</small></button>'}).join('')||'<p class="hint" style="margin:0">Tidak ada buku tersedia yang cocok. Buku yang sedang dipinjam tidak ditampilkan.</p>';
+        return res;
+      }
+      E.q.addEventListener('input',results);
+      E.q.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();var r=results();if(r.length===1){sel=r[0].id;showSel()}}});
+      list.addEventListener('click',function(e){var b=e.target.closest('button[data-id]');if(b){sel=b.dataset.id;showSel()}});
+      f._sel=function(){return sel};
+      showSel();
+      function upd(e){
+        if(e&&e.target===E.tp||e&&e.target===E.bauto||!e){}
+        if(E.bauto.checked&&E.tp.value)E.tb.value=addActive(E.tp.value,S.settings.batas);
+        E.tb.disabled=E.bauto.checked;
+        E.dval.disabled=!E.dman.checked;
+        if(!E.dman.checked)E.dval.value=E.tk.value?dendaAuto(E.tb.value,E.tk.value):0;
+        $('#calc',f).innerHTML=calcText(E.tb.value,E.tk.value,E.dman.checked);
+      }
+      ['tp','tb','tk','bauto','dman'].forEach(function(n){E[n].addEventListener('input',upd);E[n].addEventListener('change',upd)});
+      upd();
+      if(!L)E.q.focus();
+    },
+    onSubmit:function(f){
+      var E=f.elements,sel=f._sel(),b=S.books.find(function(x){return x.id===sel});
+      if(!b)return 'Pilih buku dari katalog.';
+      var nama=E.nama.value.trim();if(!nama)return 'Isi nama peminjam.';
+      var tp=E.tp.value,tb=E.tb.value,tk=E.tk.value;
+      if(!tp)return 'Isi tanggal pinjam.';
+      if(!tb)return 'Isi batas pengembalian.';
+      if(tb<tp)return 'Batas pengembalian tidak boleh sebelum tanggal pinjam.';
+      if(tk&&tk<tp)return 'Tanggal kembali tidak boleh sebelum tanggal pinjam.';
+      if(!tk&&S.loans.some(function(l){return l.bookId===sel&&!l.tglKembali&&(!L||l.id!==L.id)}))return 'Buku ini sedang dipinjam orang lain.';
+      var denda=0,dm=false;
+      if(tk){
+        if(E.dman.checked){denda=Math.max(0,parseInt(E.dval.value,10)||0);dm=true}
+        else denda=dendaAuto(tb,tk);
+      }
+      var rec={bookId:b.id,judul:b.judul,noInv:b.noInv,kode:b.kode,peminjam:nama,kelas:E.kelas.value.trim(),
+        tglPinjam:tp,tglBatas:tb,batasManual:!E.bauto.checked,tglKembali:tk||null,denda:denda,dendaManual:dm};
+      if(L)Object.assign(L,rec);else{rec.id=uid();rec.dibuat=Date.now();S.loans.push(rec)}
+      save();renderAll();toast(L?'Perubahan disimpan.':'Peminjaman dicatat.');
+    }});
+}
+
+function returnDialog(id){
+  var L=S.loans.find(function(x){return x.id===id});if(!L)return;
+  modal({title:'Catat pengembalian',submit:'Simpan pengembalian',
+    body:'<p style="margin-top:0"><b>'+esc(L.judul)+'</b><br><span class="muted">Inv. '+esc(L.noInv)+' · Kode '+esc(L.kode)+'<br>Peminjam: '+esc(L.peminjam)+(L.kelas?' ('+esc(L.kelas)+')':'')+'<br>Dipinjam '+esc(fd(L.tglPinjam))+' · Batas '+esc(fd(L.tglBatas))+'</span></p>'+
+      '<label>Tanggal kembali<input type="date" name="tk" required value="'+today()+'"></label>'+
+      '<div class="calc" id="calc"></div>'+
+      '<label class="chk"><input type="checkbox" name="dman"> Isi denda manual</label>'+
+      '<label>Jumlah denda (Rp)<input type="number" name="dval" min="0" step="500" value="0" disabled></label>',
+    onOpen:function(f){
+      var E=f.elements;
+      function upd(){
+        E.dval.disabled=!E.dman.checked;
+        if(!E.dman.checked)E.dval.value=dendaAuto(L.tglBatas,E.tk.value);
+        $('#calc',f).innerHTML=calcText(L.tglBatas,E.tk.value,E.dman.checked);
+      }
+      E.tk.addEventListener('input',upd);E.tk.addEventListener('change',upd);E.dman.addEventListener('change',upd);upd();
+    },
+    onSubmit:function(f){
+      var E=f.elements,tk=E.tk.value;
+      if(!tk)return 'Isi tanggal kembali.';
+      if(tk<L.tglPinjam)return 'Tanggal kembali tidak boleh sebelum tanggal pinjam.';
+      L.tglKembali=tk;
+      if(E.dman.checked){L.denda=Math.max(0,parseInt(E.dval.value,10)||0);L.dendaManual=true}
+      else{L.denda=dendaAuto(L.tglBatas,tk);L.dendaManual=false}
+      save();renderAll();toast(L.denda?'Dikembalikan. Denda '+rp(L.denda)+'.':'Buku dikembalikan tepat waktu.');
+    }});
+}
+
+/* ============ Unduh data ============ */
+function renderUnduh(){
+  var lb='belum pernah';if(S.lastBackup){var bd=new Date(S.lastBackup);lb=bd.getDate()+' '+BLN[bd.getMonth()]+' '+bd.getFullYear()+', '+pad(bd.getHours())+'.'+pad(bd.getMinutes())}
+  $('#v-unduh').innerHTML=
+    '<div class="panel"><h2>Laporan cetak</h2><p>Satu berkas berisi katalog, daftar eksemplar, catatan peminjaman, denda, dan kolom tanda tangan petugas. Buka berkasnya, lalu cetak atau simpan sebagai PDF dari peramban.</p>'+
+    '<div class="btns"><button class="btn primary" data-dl="laporan" type="button">Unduh laporan (HTML)</button></div></div>'+
+    '<div class="grid2"><div class="panel"><h2>Excel</h2><p>Data dalam lembar kerja yang bisa diolah dan dicetak.</p><div class="btns">'+
+    '<button class="btn" data-dl="katalog" type="button">Katalog buku</button><button class="btn" data-dl="pinjam" type="button">Peminjaman</button><button class="btn" data-dl="semua" type="button">Semua data</button></div></div>'+
+    '<div class="panel"><h2>Bukti per transaksi</h2><p>Di menu Peminjaman, tombol <b>Bukti</b> pada setiap baris mengunduh slip peminjaman atau pengembalian untuk peminjam.</p></div></div>'+
+    '<div class="panel"><h2>Cadangan dan pemulihan</h2><p>Data tersimpan di peramban perangkat ini dan tidak hilang saat aplikasi ditutup. Unduh cadangan secara berkala, terutama sebelum mengganti perangkat atau membersihkan data peramban. Cadangan terakhir: <b>'+esc(lb)+'</b>.</p>'+
+    '<div class="btns"><button class="btn primary" data-dl="backup" type="button">Unduh cadangan (JSON)</button>'+
+    '<label class="btn" style="margin:0;cursor:pointer">Pulihkan dari cadangan<input type="file" id="restoreFile" accept=".json,application/json" hidden></label></div></div>';
+}
+$('#v-unduh').addEventListener('click',function(e){
+  var t=e.target.closest('[data-dl]');if(!t)return;
+  var k=t.dataset.dl;
+  if(k==='laporan')downloadReport();else if(k==='backup')downloadBackup();else downloadSheets(k);
+});
+$('#v-unduh').addEventListener('change',function(e){
+  if(e.target.id!=='restoreFile')return;
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var o=JSON.parse(r.result);
+      if(!o||o.app!=='guna-widya'||!Array.isArray(o.books)||!Array.isArray(o.loans))throw new Error('format');
+      confirmBox('Pulihkan cadangan?','Data saat ini (<b>'+S.books.length+' eksemplar</b>, <b>'+S.loans.length+' catatan peminjaman</b>) akan diganti dengan isi cadangan (<b>'+o.books.length+' eksemplar</b>, <b>'+o.loans.length+' catatan</b>).','Pulihkan',function(){
+        S.books=o.books;S.loans=o.loans;
+        var p=S.settings.petugas;Object.assign(S.settings,o.settings||{});if(!S.settings.petugas)S.settings.petugas=p;
+        if(!Array.isArray(S.settings.libur))S.settings.libur=[];
+        save();renderAll();toast('Data berhasil dipulihkan.');
+      });
+    }catch(ex){toast('Berkas bukan cadangan Guna Widya yang valid.')}
+  };
+  r.readAsText(file);e.target.value='';
+});
+
+/* ============ Pengaturan ============ */
+function renderAtur(){
+  var st=S.settings;
+  $('#v-atur').innerHTML=
+    '<div class="panel"><h2>Aturan peminjaman dan denda</h2><p>Perubahan berlaku untuk peminjaman baru dan perhitungan berikutnya. Denda yang sudah tercatat pada buku yang telah kembali tidak berubah.</p>'+
+    '<form id="setForm" novalidate><div class="row2"><label>Nama petugas<input name="petugas" value="'+esc(st.petugas)+'"></label>'+
+    '<label>Batas peminjaman (hari aktif sekolah)<input type="number" name="batas" min="1" max="60" value="'+st.batas+'"></label>'+
+    '<label>Denda per hari (Rp)<input type="number" name="denda" min="0" step="100" value="'+st.denda+'"></label>'+
+    '<label>Hari aktif sekolah<select name="hs"><option value="5"'+(st.hariSekolah==5?' selected':'')+'>Senin–Jumat</option><option value="6"'+(st.hariSekolah==6?' selected':'')+'>Senin–Sabtu</option></select></label></div>'+
+    '<label>Denda dihitung per<select name="mode"><option value="aktif"'+(st.modeDenda==='aktif'?' selected':'')+'>Hari aktif sekolah yang terlewat</option><option value="kalender"'+(st.modeDenda==='kalender'?' selected':'')+'>Hari kalender yang terlewat</option></select></label>'+
+    '<p class="err" role="alert" hidden></p><button class="btn primary">Simpan pengaturan</button></form></div>'+
+    '<div class="panel"><h2>Hari libur sekolah</h2><p>Tanggal libur tidak dihitung sebagai hari aktif (akhir pekan sudah otomatis dikecualikan).</p>'+
+    '<div class="chips">'+(st.libur.length?st.libur.slice().sort().map(function(d){return '<span class="chip">'+esc(fd(d))+'<button type="button" data-rm="'+d+'" aria-label="Hapus '+esc(fd(d))+'">×</button></span>'}).join(''):'<span class="muted">Belum ada tanggal libur.</span>')+'</div>'+
+    '<div class="btns"><input class="fld" type="date" id="libDate" style="width:auto;margin:0" aria-label="Tanggal libur"><button class="btn" type="button" id="libAdd">Tambah tanggal libur</button></div></div>'+
+    '<div class="grid2"><div class="panel"><h2>Ganti PIN</h2><form id="pinForm" novalidate>'+
+    '<label>PIN saat ini<input type="password" name="old" autocomplete="current-password"></label>'+
+    '<label>PIN baru<input type="password" name="n1" autocomplete="new-password"></label>'+
+    '<label>Ulangi PIN baru<input type="password" name="n2" autocomplete="new-password"></label>'+
+    '<p class="err" role="alert" hidden></p><button class="btn primary">Ganti PIN</button></form></div>'+
+    '<div class="panel"><h2>Hapus semua data</h2><p>Menghapus seluruh katalog dan catatan peminjaman dari perangkat ini. Unduh cadangan terlebih dahulu.</p><button class="btn danger" type="button" id="wipe">Hapus semua data</button></div></div>';
+}
+$('#v-atur').addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target,E=f.elements,err=$('.err',f);err.hidden=true;
+  function fail(m){err.textContent=m;err.hidden=false}
+  if(f.id==='setForm'){
+    var b=parseInt(E.batas.value,10),d=parseInt(E.denda.value,10);
+    if(!(b>=1))return fail('Batas peminjaman minimal 1 hari.');
+    if(!(d>=0))return fail('Denda tidak boleh negatif.');
+    S.settings.petugas=E.petugas.value.trim();S.settings.batas=b;S.settings.denda=d;
+    S.settings.hariSekolah=+E.hs.value;S.settings.modeDenda=E.mode.value;
+    save();renderAll();toast('Pengaturan disimpan.');
+  }else if(f.id==='pinForm'){
+    var a=getAuth();
+    if(E.n1.value.length<4)return fail('PIN baru minimal 4 karakter.');
+    if(E.n1.value!==E.n2.value)return fail('Kedua PIN baru tidak sama.');
+    sha(E.old.value,a.salt).then(function(h){
+      if(h!==a.hash)return fail('PIN saat ini salah.');
+      var salt=randSalt(8);
+      return sha(E.n1.value,salt).then(function(nh){a.salt=salt;a.hash=nh;store.set(AK,JSON.stringify(a));f.reset();toast('PIN berhasil diganti.')});
+    });
+  }
+});
+$('#v-atur').addEventListener('click',function(e){
+  var t=e.target;
+  if(t.id==='libAdd'){
+    var v=$('#libDate').value;
+    if(!v){toast('Pilih tanggal libur dahulu.');return}
+    if(S.settings.libur.indexOf(v)<0)S.settings.libur.push(v);
+    save();renderAtur();
+  }else if(t.dataset&&t.dataset.rm){
+    S.settings.libur=S.settings.libur.filter(function(x){return x!==t.dataset.rm});save();renderAtur();
+  }else if(t.id==='wipe'){
+    modal({title:'Hapus semua data?',danger:true,submit:'Hapus permanen',
+      body:'<p style="margin-top:0">Seluruh katalog dan catatan peminjaman akan dihapus. Ketik <b>HAPUS</b> untuk melanjutkan.</p><label>Konfirmasi<input name="c" autocomplete="off"></label>',
+      onSubmit:function(f){
+        if(f.elements.c.value.trim()!=='HAPUS')return 'Ketik HAPUS (huruf kapital) untuk mengonfirmasi.';
+        S.books=[];S.loans=[];save();openSet.clear();renderAll();toast('Semua data dihapus.');
+      }});
+  }
+});
+
+/* ============ Mulai ============ */
+(function init(){
+  var a=getAuth();
+  if(!a){showGate('setup');return}
+  if(sess.get('gw_ok')==='1')enter();else showGate('login');
+})();
+})();
+</script>
+</body>
+</html>
